@@ -11,10 +11,10 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 class MoviesController extends AbstractController
 {
-    private $em;
-    public function __construct(EntityManagerInterface $em) {
-        $this->em = $em;
-    }
+    // private $em;
+    // public function __construct(EntityManagerInterface $em) {
+    //     $this->em = $em;
+    // }
 
     // First example
     // #[Route('/movies', name: 'app_movies')]
@@ -26,6 +26,10 @@ class MoviesController extends AbstractController
 
     //     return $this->render('movies/index.html.twig', );
     // }
+    private $movieRepository;
+    public function __construct(MovieRepository $movieRepository) {
+        $this->movieRepository = $movieRepository;
+    }
 
       #[Route('/movies', name: 'app_movies')]
     public function index(): Response
@@ -37,17 +41,29 @@ class MoviesController extends AbstractController
         // count() SELECT COUNT() from movies WHERE id = 5
 
 
-        $repository = $this->em->getRepository(Movie::class);
+        // $repository = $this->em->getRepository(Movie::class);
         // $movies = $repository->findAll();
         // $movies = $repository->find(5);
         // $movies = $repository->findBy([], ['id' => 'DESC']);
         // $movies = $repository->findOneBy(['id' => 5, 'title' => 'The dark knight'], ['id' => 'DESC']);
         // $movies = $repository->count(['id' => 5]);
-        $movies = $repository->getClassName();
+        // $movies = $repository->getClassName();
 
         //dd($movies);
+        $movies = $this->movieRepository->findAll();
+   
+        return $this->render('movies/index.html.twig', [
+            'movies' => $movies
+        ]);
+    }
 
-        return $this->render('movies/index.html.twig', );
+    #[Route('/movies/{id}', methods: ['GET'], name: 'app_movies')]
+    public function details($id) {
+        $movie = $this->movieRepository->find($id);
+
+        return $this->render('movies/show.html.twig', [
+            'movie' => $movie
+        ]);
     }
 
  
